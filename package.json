@@ -65,7 +65,7 @@
   },
   "devDependencies": {
     "@edx/frontend-build": "5.5.2",
-    "axios": "0.21.1",
+    "axios": "0.21.2",
     "axios-mock-adapter": "^1.17.0",
     "codecov": "^3.6.1",
     "enzyme-adapter-react-16": "^1.14.0",
