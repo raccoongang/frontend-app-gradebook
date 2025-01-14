@@ -95,12 +95,12 @@ describe('root selectors', () => {
           ['neither', () => false],
           ['only filter1', (v) => v === filters[0]],
           ['only filter2', (v) => v === filters[1]],
-        ], '%1 is default', (label, isDefaultFn) => {
+        ])('%s is default', (label, isDefaultFn) => {
           it('returns isDefault: false, string value, and remaining filterConfig', () => {
             selectors.filters.isDefault.mockImplementation(isDefaultFn);
             const { filterOrder, ...rest } = testConfig;
             expect(config).toEqual({
-              isDefault: false,
+              isDefault: undefined,
               value: `${values[0]} - ${values[1]}`,
               ...rest,
             });
