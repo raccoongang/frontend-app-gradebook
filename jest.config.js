@@ -10,4 +10,8 @@ module.exports = createConfig('jest', {
     'src/postcss.config.js',
     'testUtils', // don't unit test jest mocking tools
   ],
+  testEnvironment: 'jsdom',
+  testEnvironmentOptions: {
+    url: 'http://localhost/'
+  }
 });
