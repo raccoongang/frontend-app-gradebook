@@ -1,5 +1,9 @@
+import { useIntl } from '@edx/frontend-platform/i18n';
+
+import { formatMessage } from 'testUtils';
 import { getLocalizedSlash } from 'i18n/utils';
 import { actions, selectors } from 'data/redux/hooks';
+import messages from '../messages';
 import useAdjustedGradeInputData from './hooks';
 
 jest.mock('data/redux/hooks', () => ({
@@ -36,7 +40,8 @@ describe('useAdjustedGradeInputData hook', () => {
     out = useAdjustedGradeInputData();
   });
   describe('behavior', () => {
-    it('initializes redux hooks', () => {
+    it('initializes intl and redux hooks', () => {
+      expect(useIntl).toHaveBeenCalled();
       expect(selectors.root.useEditModalPossibleGrade).toHaveBeenCalled();
       expect(selectors.app.useModalData).toHaveBeenCalled();
       expect(actions.app.useSetModalState).toHaveBeenCalled();
@@ -54,6 +59,24 @@ describe('useAdjustedGradeInputData hook', () => {
       });
       it('passes localized slash and possible grade if available', () => {
         expect(out.hintText).toEqual(` ${localizedSlash} ${possibleGrade}`);
+      });
+    });
+    describe('validation feedback', () => {
+      const invalidFeedback = { type: 'invalid', text: formatMessage(messages.adjustedGradeInvalid) };
+      const warningFeedback = {
+        type: 'warning',
+        text: formatMessage(messages.adjustedGradeExceedsPossible, { adjustedGrade: '110', possibleGrade }),
+      };
+      it.each([
+        ['empty', '', null, false],
+        ['valid', '70', null, false],
+        ['invalid', 'abc', invalidFeedback, true],
+        ['above possible', '110', warningFeedback, false],
+      ])('for %s adjusted grade %p passes the matching feedback and isInvalid', (_, value, feedback, isInvalid) => {
+        selectors.app.useModalData.mockReturnValueOnce({ adjustedGradeValue: value });
+        out = useAdjustedGradeInputData();
+        expect(out.feedback).toEqual(feedback);
+        expect(out.isInvalid).toEqual(isInvalid);
       });
     });
     describe('onChange', () => {
