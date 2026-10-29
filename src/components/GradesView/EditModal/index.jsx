@@ -29,6 +29,7 @@ export const EditModal = () => {
     error,
     handleAdjustedGradeClick,
     isOpen,
+    isSaveDisabled,
   } = useEditModalData();
 
   return (
@@ -57,7 +58,11 @@ export const EditModal = () => {
           <ModalDialog.CloseButton variant="tertiary">
             {formatMessage(messages.closeText)}
           </ModalDialog.CloseButton>
-          <Button variant="primary" onClick={handleAdjustedGradeClick}>
+          <Button
+            variant="primary"
+            onClick={handleAdjustedGradeClick}
+            disabled={isSaveDisabled}
+          >
             {formatMessage(messages.saveGrade)}
           </Button>
         </ActionRow>
