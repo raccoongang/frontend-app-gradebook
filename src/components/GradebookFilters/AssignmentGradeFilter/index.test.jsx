@@ -15,6 +15,7 @@ const hookData = {
   handleSetMax: jest.fn(),
   handleSetMin: jest.fn(),
   selectedAssignment: 'test-assignment',
+  isApplyDisabled: false,
   assignmentGradeMax: 300,
   assignmentGradeMin: 23,
 };
@@ -42,10 +43,12 @@ describe('AssignmentFilter component', () => {
       it('renders a PercentGroup for both Max and Min filters', () => {
         let { props } = el.instance.findByType(PercentGroup)[0];
         expect(props.value).toEqual(hookData.assignmentGradeMin);
+        expect(props.max).toEqual(null);
         expect(props.disabled).toEqual(false);
         expect(props.onChange).toEqual(hookData.handleSetMin);
         props = el.instance.findByType(PercentGroup)[1].props;
         expect(props.value).toEqual(hookData.assignmentGradeMax);
+        expect(props.max).toEqual(null);
         expect(props.disabled).toEqual(false);
         expect(props.onChange).toEqual(hookData.handleSetMax);
       });
@@ -55,11 +58,22 @@ describe('AssignmentFilter component', () => {
         expect(props.onClick).toEqual(hookData.handleSubmit);
       });
     });
+    describe('with invalid limits', () => {
+      it('disables the submit button only', () => {
+        useAssignmentGradeFilterData.mockReturnValueOnce({ ...hookData, isApplyDisabled: true });
+        el = shallow(<AssignmentFilter updateQueryParams={updateQueryParams} />);
+        expect(el.instance.findByType(Button)[0].props.disabled).toEqual(true);
+        el.instance.findByType(PercentGroup).forEach(({ props }) => {
+          expect(props.disabled).toEqual(false);
+        });
+      });
+    });
     describe('without selected assignment', () => {
       beforeEach(() => {
         useAssignmentGradeFilterData.mockReturnValueOnce({
           ...hookData,
           selectedAssignment: null,
+          isApplyDisabled: true,
         });
         el = shallow(<AssignmentFilter updateQueryParams={updateQueryParams} />);
       });

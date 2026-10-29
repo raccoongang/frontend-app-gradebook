@@ -6,16 +6,22 @@ import messages from './messages';
 export const useStatusAlertsData = () => {
   const { formatMessage } = useIntl();
 
-  const limitValidity = selectors.app.useCourseGradeFilterValidity();
+  const assignmentValidity = selectors.app.useAssignmentGradeFilterValidity();
+  const courseValidity = selectors.app.useCourseGradeFilterValidity();
+  const selectedAssignment = selectors.filters.useSelectedAssignmentLabel();
   const showSuccessBanner = selectors.grades.useShowSuccess();
   const handleCloseSuccessBanner = actions.grades.useCloseBanner();
 
-  const isCourseGradeFilterAlertOpen = !limitValidity.isMinValid || !limitValidity.isMaxValid;
-
-  const validityMessages = {
-    min: limitValidity.isMinValid ? '' : formatMessage(messages.minGradeInvalid),
-    max: limitValidity.isMaxValid ? '' : formatMessage(messages.maxGradeInvalid),
-  };
+  const gradeFilterMessages = [
+    ...(selectedAssignment ? [
+      [assignmentValidity.isMinValid, messages.minAssignmentGradeInvalid],
+      [assignmentValidity.isMaxValid, messages.maxAssignmentGradeInvalid],
+      [assignmentValidity.isRangeValid, messages.assignmentGradeRangeInvalid],
+    ] : []),
+    [courseValidity.isMinValid, messages.minGradeInvalid],
+    [courseValidity.isMaxValid, messages.maxGradeInvalid],
+    [courseValidity.isRangeValid, messages.courseGradeRangeInvalid],
+  ].filter(([isValid]) => !isValid).map(([, message]) => formatMessage(message));
 
   return {
     successBanner: {
@@ -24,8 +30,8 @@ export const useStatusAlertsData = () => {
       text: formatMessage(messages.editSuccessAlert),
     },
     gradeFilter: {
-      show: isCourseGradeFilterAlertOpen,
-      text: `${validityMessages.min}${validityMessages.max}`,
+      show: gradeFilterMessages.length > 0,
+      messages: gradeFilterMessages,
     },
   };
 };

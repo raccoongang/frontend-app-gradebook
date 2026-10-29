@@ -2,6 +2,7 @@ import appActions from 'data/actions/app';
 import filterActions from 'data/actions/filters';
 import gradesActions from 'data/actions/grades';
 import { formatDateForDisplay } from 'data/actions/utils';
+import { filterConfig } from 'data/constants/filters';
 import app, { initialState } from './app';
 
 const testingState = {
@@ -228,6 +229,14 @@ describe('app reducer', () => {
             assignmentGradeMax: initialState.filters.assignmentGradeMax,
             courseGradeMin: initialState.filters.courseGradeMin,
           },
+        });
+      });
+      it('resets both assignment grade limits when the assignment filter badge closes', () => {
+        const state = { ...testingState, filters };
+        expect(app(state, filterActions.reset(filterConfig.assignment.connectedFilters)).filters).toEqual({
+          ...filters,
+          assignmentGradeMax: initialState.filters.assignmentGradeMax,
+          assignmentGradeMin: initialState.filters.assignmentGradeMin,
         });
       });
     });

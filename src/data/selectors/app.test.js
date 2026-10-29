@@ -38,21 +38,34 @@ describe('app selectors', () => {
       });
     });
   });
+  describe('assignmentGradeFilterValidity', () => {
+    it.each([
+      ['0', '100', true, true, true],
+      ['110', '5000', true, true, true],
+      ['80', '80', true, true, true],
+      ['-1', '100', false, true, true],
+      ['0', '-1', true, false, true],
+      ['', '', false, false, true],
+      ['80', '10', true, true, false],
+    ])('for min %p and max %p returns isMinValid %p, isMaxValid %p, isRangeValid %p (no upper bound)', (assignmentGradeMin, assignmentGradeMax, isMinValid, isMaxValid, isRangeValid) => {
+      expect(selectors.assignmentGradeFilterValidity({
+        app: { filters: { assignmentGradeMin, assignmentGradeMax } },
+      })).toEqual({ isMinValid, isMaxValid, isRangeValid });
+    });
+  });
   describe('courseGradeFilterValidity', () => {
-    it('returns true iff the value is between 0 and 100 (inclusive)', () => {
-      const testSelector = (courseGradeMax, isMaxValid, courseGradeMin, isMinValid) => {
-        expect(selectors.courseGradeFilterValidity({
-          ...testState,
-          app: {
-            ...testState.app,
-            filters: { ...testState.filters, courseGradeMax, courseGradeMin },
-          },
-        })).toEqual({ isMaxValid, isMinValid });
-      };
-      testSelector(-1, false, 0, true);
-      testSelector(0, true, -1, false);
-      testSelector(100, true, 101, false);
-      testSelector(101, false, 100, true);
+    it.each([
+      ['0', '100', true, true, true],
+      ['0', '-1', true, false, true],
+      ['-1', '0', false, true, true],
+      ['101', '100', false, true, true],
+      ['100', '101', true, false, true],
+      ['', '', false, false, true],
+      ['80', '10', true, true, false],
+    ])('for min %p and max %p returns isMinValid %p, isMaxValid %p, isRangeValid %p (0 to 100, inclusive)', (courseGradeMin, courseGradeMax, isMinValid, isMaxValid, isRangeValid) => {
+      expect(selectors.courseGradeFilterValidity({
+        app: { filters: { courseGradeMin, courseGradeMax } },
+      })).toEqual({ isMinValid, isMaxValid, isRangeValid });
     });
   });
   describe('courseGradeLimits', () => {
@@ -75,22 +88,20 @@ describe('app selectors', () => {
       }]);
     });
   });
-  describe('areCourseGradeFiltersValid', () => {
-    const mockValidity = (isMinValid, isMaxValid) => {
-      selectors.courseGradeFilterValidity = jest.fn(() => ({
-        isMinValid,
-        isMaxValid,
-      }));
-    };
-    it('returns true iff courseGrade filters are both valid', () => {
-      const old = selectors.courseGradeFilterValidity;
-      mockValidity(false, true);
-      expect(exportedSelectors.areCourseGradeFiltersValid(testState)).toEqual(false);
-      mockValidity(true, false);
-      expect(exportedSelectors.areCourseGradeFiltersValid(testState)).toEqual(false);
-      mockValidity(true, true);
-      expect(exportedSelectors.areCourseGradeFiltersValid(testState)).toEqual(true);
-      selectors.courseGradeFilterValidity = old;
+  describe.each([
+    ['areAssignmentGradeFiltersValid', 'assignmentGradeFilterValidity'],
+    ['areCourseGradeFiltersValid', 'courseGradeFilterValidity'],
+  ])('%s', (selectorName, validityName) => {
+    it.each([
+      [false, true, true, false],
+      [true, false, true, false],
+      [true, true, false, false],
+      [true, true, true, true],
+    ])('with isMinValid %p, isMaxValid %p and isRangeValid %p returns %p', (isMinValid, isMaxValid, isRangeValid, expected) => {
+      const old = selectors[validityName];
+      selectors[validityName] = jest.fn(() => ({ isMinValid, isMaxValid, isRangeValid }));
+      expect(exportedSelectors[selectorName](testState)).toEqual(expected);
+      selectors[validityName] = old;
     });
   });
 
