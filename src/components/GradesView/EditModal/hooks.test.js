@@ -10,7 +10,6 @@ jest.mock('data/redux/hooks', () => ({
   selectors: {
     app: { useModalData: jest.fn() },
     grades: { useGradeData: jest.fn() },
-    root: { useEditModalPossibleGrade: jest.fn() },
   },
   thunkActions: {
     grades: { useUpdateGrades: jest.fn() },
@@ -28,7 +27,6 @@ const gradeData = { gradeOverridHistoryError: 'test-error' };
 const modalData = { open: true, adjustedGradeValue: '5' };
 selectors.app.useModalData.mockReturnValue(modalData);
 selectors.grades.useGradeData.mockReturnValue(gradeData);
-selectors.root.useEditModalPossibleGrade.mockReturnValue('20');
 
 let out;
 describe('useEditModalData', () => {
@@ -43,7 +41,6 @@ describe('useEditModalData', () => {
       expect(actions.app.useCloseModal).toHaveBeenCalled();
       expect(actions.grades.useDoneViewingAssignment).toHaveBeenCalled();
       expect(thunkActions.grades.useUpdateGrades).toHaveBeenCalled();
-      expect(selectors.root.useEditModalPossibleGrade).toHaveBeenCalled();
     });
   });
   describe('output', () => {
@@ -51,9 +48,8 @@ describe('useEditModalData', () => {
       it.each([
         ['', true],
         ['abc', true],
-        ['25', false],
         ['5', false],
-      ])('for adjusted grade %p (out of 20) returns %p', (adjustedGradeValue, expected) => {
+      ])('for adjusted grade %p returns %p', (adjustedGradeValue, expected) => {
         selectors.app.useModalData.mockReturnValueOnce({ ...modalData, adjustedGradeValue });
         out = useEditModalData();
         expect(out.isSaveDisabled).toEqual(expected);
