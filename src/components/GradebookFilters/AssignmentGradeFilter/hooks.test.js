@@ -4,7 +4,10 @@ import useAssignmentGradeFilterData from './hooks';
 
 jest.mock('data/redux/hooks', () => ({
   selectors: {
-    app: { useAssignmentGradeLimits: jest.fn() },
+    app: {
+      useAreAssignmentGradeFiltersValid: jest.fn(),
+      useAssignmentGradeLimits: jest.fn(),
+    },
     filters: { useSelectedAssignmentLabel: jest.fn() },
   },
   actions: {
@@ -22,6 +25,7 @@ const assignmentGradeLimits = { assignmentGradeMax: 200, assignmentGradeMin: 3 }
 const selectedAssignmentLabel = 'test-assignment-label';
 selectors.app.useAssignmentGradeLimits.mockReturnValue(assignmentGradeLimits);
 selectors.filters.useSelectedAssignmentLabel.mockReturnValue(selectedAssignmentLabel);
+selectors.app.useAreAssignmentGradeFiltersValid.mockReturnValue(true);
 
 const setLocalFilter = jest.fn();
 const updateAssignmentLimits = jest.fn();
@@ -42,6 +46,7 @@ describe('useAssignmentFilterData hook', () => {
     it('initializes redux hooks', () => {
       expect(selectors.app.useAssignmentGradeLimits).toHaveBeenCalledWith();
       expect(selectors.filters.useSelectedAssignmentLabel).toHaveBeenCalledWith();
+      expect(selectors.app.useAreAssignmentGradeFiltersValid).toHaveBeenCalledWith();
       expect(actions.app.useSetLocalFilter).toHaveBeenCalledWith();
       expect(actions.filters.useUpdateAssignmentLimits).toHaveBeenCalledWith();
       expect(thunkActions.grades.useFetchGrades).toHaveBeenCalledWith();
@@ -69,6 +74,18 @@ describe('useAssignmentFilterData hook', () => {
     test('handleSetMin sets assignmentGradeMin', () => {
       out.handleSetMin({ target: { value: testValue } });
       expect(setLocalFilter).toHaveBeenCalledWith({ assignmentGradeMin: testValue });
+    });
+    describe('isApplyDisabled', () => {
+      it.each([
+        [selectedAssignmentLabel, true, false],
+        [selectedAssignmentLabel, false, true],
+        [null, true, true],
+      ])('with selected assignment %p and valid limits %p returns %p', (label, areLimitsValid, expected) => {
+        selectors.filters.useSelectedAssignmentLabel.mockReturnValueOnce(label);
+        selectors.app.useAreAssignmentGradeFiltersValid.mockReturnValueOnce(areLimitsValid);
+        out = useAssignmentGradeFilterData({ updateQueryParams });
+        expect(out.isApplyDisabled).toEqual(expected);
+      });
     });
     it('passes selectedAssignment from hook', () => {
       expect(out.selectedAssignment).toEqual(selectedAssignmentLabel);

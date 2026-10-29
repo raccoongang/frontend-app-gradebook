@@ -4,6 +4,7 @@ import { selectors, actions, thunkActions } from 'data/redux/hooks';
 const useAssignmentGradeFilterData = ({ updateQueryParams }) => {
   const localAssignmentLimits = selectors.app.useAssignmentGradeLimits();
   const selectedAssignment = selectors.filters.useSelectedAssignmentLabel();
+  const areLimitsValid = selectors.app.useAreAssignmentGradeFiltersValid();
   const fetchGrades = thunkActions.grades.useFetchGrades();
   const setFilter = actions.app.useSetLocalFilter();
   const updateAssignmentLimits = actions.filters.useUpdateAssignmentLimits();
@@ -27,6 +28,7 @@ const useAssignmentGradeFilterData = ({ updateQueryParams }) => {
     assignmentGradeMin,
     assignmentGradeMax,
     selectedAssignment,
+    isApplyDisabled: !selectedAssignment || !areLimitsValid,
     handleSetMax,
     handleSetMin,
     handleSubmit,

@@ -14,7 +14,16 @@ exports[`StatusAlerts component render snapshot 1`] = `
     show="hooks.show-grade-filter"
     variant="danger"
   >
-    hooks.grade-filter-text
+    <div
+      key="hooks.grade-filter-message-1"
+    >
+      hooks.grade-filter-message-1
+    </div>
+    <div
+      key="hooks.grade-filter-message-2"
+    >
+      hooks.grade-filter-message-2
+    </div>
   </Alert>
 </Fragment>
 `;
