@@ -21,7 +21,9 @@ export const root = StrictDict({
 
 export const app = StrictDict({
   useActiveView: selectorHook(selectors.app.activeView),
+  useAssignmentGradeFilterValidity: selectorHook(selectors.app.assignmentGradeFilterValidity),
   useAssignmentGradeLimits: selectorHook(selectors.app.assignmentGradeLimits),
+  useAreAssignmentGradeFiltersValid: selectorHook(selectors.app.areAssignmentGradeFiltersValid),
   useAreCourseGradeFiltersValid: selectorHook(selectors.app.areCourseGradeFiltersValid),
   useCourseGradeLimits: selectorHook(selectors.app.courseGradeLimits),
   useCourseGradeFilterValidity: selectorHook(selectors.app.courseGradeFilterValidity),

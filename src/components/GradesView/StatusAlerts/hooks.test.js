@@ -11,7 +11,11 @@ jest.mock('data/redux/hooks', () => ({
     grades: { useCloseBanner: jest.fn() },
   },
   selectors: {
-    app: { useCourseGradeFilterValidity: jest.fn() },
+    app: {
+      useAssignmentGradeFilterValidity: jest.fn(),
+      useCourseGradeFilterValidity: jest.fn(),
+    },
+    filters: { useSelectedAssignmentLabel: jest.fn() },
     grades: { useShowSuccess: jest.fn() },
   },
 }));
@@ -19,8 +23,11 @@ jest.mock('data/redux/hooks', () => ({
 const validity = {
   isMinValid: true,
   isMaxValid: true,
+  isRangeValid: true,
 };
+selectors.app.useAssignmentGradeFilterValidity.mockReturnValue(validity);
 selectors.app.useCourseGradeFilterValidity.mockReturnValue(validity);
+selectors.filters.useSelectedAssignmentLabel.mockReturnValue('test-assignment');
 const showSuccess = 'test-show-success';
 selectors.grades.useShowSuccess.mockReturnValue(showSuccess);
 const closeBanner = jest.fn().mockName('hooks.closeBanner');
@@ -38,7 +45,9 @@ describe('useStatusAlertsData', () => {
     });
     it('initializes redux hooks', () => {
       expect(actions.grades.useCloseBanner).toHaveBeenCalled();
+      expect(selectors.app.useAssignmentGradeFilterValidity).toHaveBeenCalled();
       expect(selectors.app.useCourseGradeFilterValidity).toHaveBeenCalled();
+      expect(selectors.filters.useSelectedAssignmentLabel).toHaveBeenCalled();
       expect(selectors.grades.useShowSuccess).toHaveBeenCalled();
     });
   });
@@ -53,57 +62,28 @@ describe('useStatusAlertsData', () => {
       });
     });
     describe('gradeFilter', () => {
-      describe('both filters are valid', () => {
-        test('do not show', () => {
-          expect(out.gradeFilter.show).toEqual(false);
-        });
+      it.each([
+        ['all limits are valid', validity, validity, []],
+        ['course min is invalid', validity, { ...validity, isMinValid: false }, ['minGradeInvalid']],
+        ['course min and max are invalid', validity, { ...validity, isMinValid: false, isMaxValid: false }, ['minGradeInvalid', 'maxGradeInvalid']],
+        ['course min is greater than max', validity, { ...validity, isRangeValid: false }, ['courseGradeRangeInvalid']],
+        ['assignment min is invalid', { ...validity, isMinValid: false }, validity, ['minAssignmentGradeInvalid']],
+        ['assignment max is invalid', { ...validity, isMaxValid: false }, validity, ['maxAssignmentGradeInvalid']],
+        ['assignment min is greater than max', { ...validity, isRangeValid: false }, validity, ['assignmentGradeRangeInvalid']],
+        ['assignment and course limits are invalid', { ...validity, isMinValid: false }, { ...validity, isMaxValid: false }, ['minAssignmentGradeInvalid', 'maxGradeInvalid']],
+      ])('when %s', (_, assignmentValidity, courseValidity, expected) => {
+        selectors.app.useAssignmentGradeFilterValidity.mockReturnValueOnce(assignmentValidity);
+        selectors.app.useCourseGradeFilterValidity.mockReturnValueOnce(courseValidity);
+        out = useStatusAlertsData();
+        expect(out.gradeFilter.messages).toEqual(expected.map((key) => formatMessage(messages[key])));
+        expect(out.gradeFilter.show).toEqual(expected.length > 0);
       });
-      describe('min filter is invalid', () => {
-        beforeEach(() => {
-          selectors.app.useCourseGradeFilterValidity.mockReturnValue({
-            isMinValid: false,
-            isMaxValid: true,
-          });
-          out = useStatusAlertsData();
-        });
-        test('show grade filter banner', () => {
-          expect(out.gradeFilter.show).toEqual(true);
-        });
-        test('filter message', () => {
-          expect(out.gradeFilter.text).toEqual(formatMessage(messages.minGradeInvalid));
-        });
-      });
-      describe('max filter is invalid', () => {
-        beforeEach(() => {
-          selectors.app.useCourseGradeFilterValidity.mockReturnValue({
-            isMinValid: true,
-            isMaxValid: false,
-          });
-          out = useStatusAlertsData();
-        });
-        test('show grade filter banner', () => {
-          expect(out.gradeFilter.show).toEqual(true);
-        });
-        test('filter message', () => {
-          expect(out.gradeFilter.text).toEqual(formatMessage(messages.maxGradeInvalid));
-        });
-      });
-      describe('both filters are invalid', () => {
-        beforeEach(() => {
-          selectors.app.useCourseGradeFilterValidity.mockReturnValue({
-            isMinValid: false,
-            isMaxValid: false,
-          });
-          out = useStatusAlertsData();
-        });
-        test('show grade filter banner', () => {
-          expect(out.gradeFilter.show).toEqual(true);
-        });
-        test('filter message', () => {
-          expect(out.gradeFilter.text).toEqual(
-            `${formatMessage(messages.minGradeInvalid)}${formatMessage(messages.maxGradeInvalid)}`,
-          );
-        });
+      it('ignores invalid assignment limits when no assignment is selected', () => {
+        selectors.filters.useSelectedAssignmentLabel.mockReturnValueOnce(null);
+        selectors.app.useAssignmentGradeFilterValidity.mockReturnValueOnce({ ...validity, isMinValid: false });
+        out = useStatusAlertsData();
+        expect(out.gradeFilter.messages).toEqual([]);
+        expect(out.gradeFilter.show).toEqual(false);
       });
     });
   });

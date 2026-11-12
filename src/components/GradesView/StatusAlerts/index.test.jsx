@@ -16,7 +16,7 @@ const hookProps = {
   },
   gradeFilter: {
     show: 'hooks.show-grade-filter',
-    text: 'hooks.grade-filter-text',
+    messages: ['hooks.grade-filter-message-1', 'hooks.grade-filter-message-2'],
   },
 };
 useStatusAlertsData.mockReturnValue(hookProps);
@@ -43,11 +43,11 @@ describe('StatusAlerts component', () => {
       expect(props.show).toEqual(hookProps.successBanner.show);
       expect(alert.children[0].el).toEqual(hookProps.successBanner.text);
     });
-    test('grade filter banner', () => {
+    test('grade filter banner shows each message on its own line', () => {
       const alert = el.instance.findByType(Alert)[1];
       const { props } = alert;
       expect(props.show).toEqual(hookProps.gradeFilter.show);
-      expect(alert.children[0].el).toEqual(hookProps.gradeFilter.text);
+      expect(alert.children.map((line) => line.children[0].el)).toEqual(hookProps.gradeFilter.messages);
     });
   });
 });

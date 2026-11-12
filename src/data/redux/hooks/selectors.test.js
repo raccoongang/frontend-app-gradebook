@@ -57,7 +57,9 @@ describe('selector hooks', () => {
   describe('app', () => {
     loadSelectorGroup(selectorHooks.app, selectors.app);
     testHook(hookKeys.useActiveView, selKeys.activeView);
+    testHook(hookKeys.useAssignmentGradeFilterValidity, selKeys.assignmentGradeFilterValidity);
     testHook(hookKeys.useAssignmentGradeLimits, selKeys.assignmentGradeLimits);
+    testHook(hookKeys.useAreAssignmentGradeFiltersValid, selKeys.areAssignmentGradeFiltersValid);
     testHook(hookKeys.useAreCourseGradeFiltersValid, selKeys.areCourseGradeFiltersValid);
     testHook(hookKeys.useCourseGradeLimits, selKeys.courseGradeLimits);
     testHook(hookKeys.useCourseId, selKeys.courseId);

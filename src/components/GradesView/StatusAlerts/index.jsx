@@ -24,7 +24,7 @@ export const StatusAlerts = () => {
         dismissible={false}
         show={gradeFilter.show}
       >
-        {gradeFilter.text}
+        {gradeFilter.messages.map((message) => <div key={message}>{message}</div>)}
       </Alert>
     </>
   );

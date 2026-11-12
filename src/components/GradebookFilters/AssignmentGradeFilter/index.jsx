@@ -13,6 +13,7 @@ export const AssignmentGradeFilter = ({ updateQueryParams }) => {
     assignmentGradeMin,
     assignmentGradeMax,
     selectedAssignment,
+    isApplyDisabled,
     handleSetMax,
     handleSetMin,
     handleSubmit,
@@ -24,6 +25,7 @@ export const AssignmentGradeFilter = ({ updateQueryParams }) => {
         id="assignmentGradeMin"
         label={formatMessage(messages.minGrade)}
         value={assignmentGradeMin}
+        max={null}
         disabled={!selectedAssignment}
         onChange={handleSetMin}
       />
@@ -31,6 +33,7 @@ export const AssignmentGradeFilter = ({ updateQueryParams }) => {
         id="assignmentGradeMax"
         label={formatMessage(messages.maxGrade)}
         value={assignmentGradeMax}
+        max={null}
         disabled={!selectedAssignment}
         onChange={handleSetMax}
       />
@@ -39,7 +42,7 @@ export const AssignmentGradeFilter = ({ updateQueryParams }) => {
           type="submit"
           variant="outline-secondary"
           name="assignmentGradeMinMax"
-          disabled={!selectedAssignment}
+          disabled={isApplyDisabled}
           onClick={handleSubmit}
         >
           {formatMessage(messages.apply)}

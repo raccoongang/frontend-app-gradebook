@@ -28,6 +28,10 @@ describe('PercentGroup', () => {
         const el = shallow(<PercentGroup {...props} disabled />);
         expect(el.snapshot).toMatchSnapshot();
       });
+      test('without a max', () => {
+        const el = shallow(<PercentGroup {...props} max={null} />);
+        expect(el.snapshot).toMatchSnapshot();
+      });
     });
   });
 });

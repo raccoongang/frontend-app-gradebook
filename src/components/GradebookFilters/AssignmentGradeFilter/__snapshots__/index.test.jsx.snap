@@ -8,6 +8,7 @@ exports[`AssignmentFilter component render with selected assignment snapshot 1`]
     disabled={false}
     id="assignmentGradeMin"
     label="Min Grade"
+    max={null}
     onChange={[MockFunction]}
     value={23}
   />
@@ -15,6 +16,7 @@ exports[`AssignmentFilter component render with selected assignment snapshot 1`]
     disabled={false}
     id="assignmentGradeMax"
     label="Max Grade"
+    max={null}
     onChange={[MockFunction]}
     value={300}
   />
@@ -41,6 +43,7 @@ exports[`AssignmentFilter component render without selected assignment snapshot 
     disabled={true}
     id="assignmentGradeMin"
     label="Min Grade"
+    max={null}
     onChange={[MockFunction]}
     value={23}
   />
@@ -48,6 +51,7 @@ exports[`AssignmentFilter component render without selected assignment snapshot 
     disabled={true}
     id="assignmentGradeMax"
     label="Max Grade"
+    max={null}
     onChange={[MockFunction]}
     value={300}
   />
