@@ -24,7 +24,7 @@ actions.grades.useDoneViewingAssignment.mockReturnValue(doneViewingAssignment);
 thunkActions.grades.useUpdateGrades.mockReturnValue(updateGrades);
 
 const gradeData = { gradeOverridHistoryError: 'test-error' };
-const modalData = { open: true };
+const modalData = { open: true, adjustedGradeValue: '5' };
 selectors.app.useModalData.mockReturnValue(modalData);
 selectors.grades.useGradeData.mockReturnValue(gradeData);
 
@@ -44,6 +44,17 @@ describe('useEditModalData', () => {
     });
   });
   describe('output', () => {
+    describe('isSaveDisabled', () => {
+      it.each([
+        ['', true],
+        ['abc', true],
+        ['5', false],
+      ])('for adjusted grade %p returns %p', (adjustedGradeValue, expected) => {
+        selectors.app.useModalData.mockReturnValueOnce({ ...modalData, adjustedGradeValue });
+        out = useEditModalData();
+        expect(out.isSaveDisabled).toEqual(expected);
+      });
+    });
     it('forwards error from gradeData.gradeOverrideHistoryError', () => {
       expect(out.error).toEqual(gradeData.gradeOverrideHistoryError);
     });

@@ -24,6 +24,7 @@ const hookProps = {
   error: 'test-error',
   handleAdjustedGradeClick: jest.fn().mockName('hooks.handleAdjustedGradeClick'),
   isOpen: 'test-is-open',
+  isSaveDisabled: 'test-is-save-disabled',
 };
 useEditModalData.mockReturnValue(hookProps);
 
@@ -93,6 +94,7 @@ describe('EditModal component', () => {
         expect(button.children[0].el).toEqual(formatMessage(messages.saveGrade));
         expect(button.type).toEqual('Button');
         expect(button.props.onClick).toEqual(hookProps.handleAdjustedGradeClick);
+        expect(button.props.disabled).toEqual(hookProps.isSaveDisabled);
       });
     };
     describe('without error', () => {

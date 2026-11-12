@@ -1,13 +1,23 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`AdjustedGradeInput component render snapshot 1`] = `
-<span>
-  <Form.Control
-    name="adjustedGradeValue"
-    onChange={[MockFunction hook.onChange]}
-    type="text"
-    value="test-value"
+<Form.Group
+  className="mb-0"
+  isInvalid={false}
+>
+  <span>
+    <Form.Control
+      aria-invalid={false}
+      aria-required={true}
+      name="adjustedGradeValue"
+      onChange={[MockFunction hook.onChange]}
+      type="text"
+      value="test-value"
+    />
+    some-hint-text
+  </span>
+  <div
+    aria-live="polite"
   />
-  some-hint-text
-</span>
+</Form.Group>
 `;
